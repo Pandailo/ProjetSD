@@ -16,6 +16,7 @@ void error(char *msg)
 }
 
 /* USAGE: nom-prog HOST-NAME PORT-NUMBER */
+/* test */
 
 int main(int argc,char *argv[])
 {
