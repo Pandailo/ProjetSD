@@ -140,7 +140,7 @@ int main(int argc,char *argv[])
 	int u=0;
 	int k=0;
 	int cptv=0;
-	for(i;i<taille_b;i++)
+	for(i=0;i<taille_b;i++)
 	{//Lignes bloc
 		for(j=0;j<taille_b;j++)
 		{//colonnes bloc
