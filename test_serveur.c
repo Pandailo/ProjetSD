@@ -300,6 +300,7 @@ int main(int argc, char* argcv[])
 					exit(0); 
 				}
 				exit(0);*/
+				
 				}
 				while(strcmp(buffer,"STOP")!=0);
 				close(newsockfd);

@@ -137,6 +137,85 @@ int main(int argc,char *argv[])
 	bzero(buffer,256);
 	
 	/*TRAITEMENT*/
+	int u=0;
+	int k=0;
+	int cptv=0;
+	for(i;i<taille_b;i++)
+	{//Lignes bloc
+		for(j=0;j<taille_b;j++)
+		{//colonnes bloc
+		cptv=0;
+			if(bloc2[i][j]==0)
+			{//si cellule vivante
+				if(i+1==taille_b)
+				{//si bord
+					if(j+1==taille_b)
+					{//si coin
+					}
+					else
+					{
+					}
+				}
+				else
+				{
+					if(j+1==taille_b)
+					{//si bord
+					}
+					else
+					{
+						for(u=-1;u<2;u++)
+						{
+							for(k=-1;k<2;k++)
+							{
+								if(bloc2[i+u][j+k]==1) cptv++;						
+							}
+						
+						}
+					}
+					
+				}
+				if(cptv!=2 &&cptv!=3)
+					bloc2[i][j]=0;				
+			}//FIN SI CELLULE VIVANTE
+			else
+			{
+				if(i+1==taille_b)
+				{//si bord
+					if(j+1==taille_b)
+					{//si coin
+					}
+					else
+					{
+					}
+				}
+				else
+				{
+					if(j+1==taille_b)
+					{//si bord
+					}
+					else
+					{
+						for(u=-1;u<2;u++)
+						{
+							for(k=-1;k<2;k++)
+							{
+								if(u!=0&&k!=0)
+									{if(bloc2[i+u][j+k]==1) cptv++;}						
+							}
+						
+						}
+					}
+					
+				}
+				if(cptv==3)
+					bloc2[i][j]==1;
+			}
+			printf("Nouveau bloc [%d][%d] : %d \n",i,j,bloc2[i][j]);
+			
+		//FIN FOR
+		}
+	}//FIN DOUBLE FOR
+		
 	/*RENVOI*/
 	
 	/*ARRET*/
