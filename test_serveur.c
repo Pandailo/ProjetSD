@@ -346,6 +346,7 @@ int main(int argc, char* argcv[])
 							{
 								strt2[f]=buffer[h];
 								h++;
+								f++;
 							}
 							temp2=atoi(strt2);
 							printf("Temp2 %d \n",temp2);
