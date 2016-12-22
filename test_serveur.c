@@ -296,6 +296,7 @@ int main(int argc, char* argcv[])
 				}
 				if(rescmp4==0)
 				{
+					printf("Yo \n");
 					bzero(buffer,256);
 					n=read(newsockfd,buffer,256);
 					if(n<0)
@@ -352,7 +353,9 @@ int main(int argc, char* argcv[])
 							printf("Temp2 %d \n",temp2);
 						}		
 						h++;
+					
 					}
+					bzero(buffer,256);
 
 				}
 				
