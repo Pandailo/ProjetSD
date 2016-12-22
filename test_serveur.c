@@ -189,8 +189,9 @@ int main(int argc, char* argcv[])
 	int rescmp2=1;
 	int rescmp3=1;
 	int rescmp4=1;
+	int rescmp5=1;
 	pid_t pid;
-	char str1[10],str2[10],str3[10],str4[10];
+	char str1[10],str2[10],str3[10],str4[10],str5[10];
 
 	/********************************NUMERO DE PORT**************************/
 	if (argc<2)
@@ -241,6 +242,8 @@ int main(int argc, char* argcv[])
 				rescmp2=strcmp(buffer,str3);
 				strcpy(str4,"BTRAITE");
 				rescmp3=strcmp(buffer,str4);
+				strcpy(str5,"ENVOI");
+				rescmp4=strcmp(buffer,str5);
 				sprintf(tempo,"%d",(taille));
 				sprintf(tempo2,"%d",(taillebloc));
 				if(rescmp==0)
@@ -291,7 +294,66 @@ int main(int argc, char* argcv[])
 						error("ERROR ecrire dans socket");
 				
 				}
-				
+				if(rescmp4==0)
+				{
+					bzero(buffer,256);
+					n=read(newsockfd,buffer,256);
+					if(n<0)
+						error("ERROR lire dans socket");
+					int h=0;
+					int temp1,temp2;
+					temp1=temp2=0;
+					int f=0;
+					char strt[10];
+					while(buffer[h]!='\0')
+					{
+						if(buffer[h]=='I')
+						{
+							f=0;
+							h=h+2;
+							//On cherche le nombbre de chiffres derriere "I="
+							while(buffer[h]!=' ')
+							{
+								f++;
+								h++;
+							}
+							char strt[f];
+							h=h-f;
+							f=0;
+							//On récupère lapartie utile
+							while(buffer[h]!=' ')
+							{
+								strt[f]=buffer[h];
+								f++;
+								h++;
+							}
+							temp1=atoi(strt);
+							printf("Temp1 %d \n",temp1);
+						}	
+						if(buffer[h]=='J')
+						{
+							f=0;
+							h=h+2;
+							while(buffer[h]!='\0')
+							{
+								f++;
+								h++;
+							}
+							char strt2[f];
+							h=h-f;
+							f=0;
+							while(buffer[h]!='\0')
+							{
+								strt2[f]=buffer[h];
+								h++;
+							}
+							temp2=atoi(strt2);
+							printf("Temp2 %d \n",temp2);
+						}		
+						h++;
+					}
+
+				}
 				
 				/*else
 				{

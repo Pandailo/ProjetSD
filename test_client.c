@@ -140,6 +140,7 @@ int main(int argc,char *argv[])
 	int u=0;
 	int k=0;
 	int cptv=0;
+	int tmp=0;
 	for(i=0;i<taille_b;i++)
 	{//Lignes bloc
 		for(j=0;j<taille_b;j++)
@@ -147,33 +148,37 @@ int main(int argc,char *argv[])
 		cptv=0;
 			if(bloc2[i][j]==0)
 			{//si cellule vivante
-				if(i+1==taille_b)
-				{//si bord
-					if(j+1==taille_b)
-					{//si coin
-					}
-					else
-					{
-					}
-				}
-				else
-				{
-					if(j+1==taille_b)
-					{//si bord
-					}
-					else
-					{
 						for(u=-1;u<2;u++)
 						{
 							for(k=-1;k<2;k++)
 							{
-								if(bloc2[i+u][j+k]==1) cptv++;						
+								if(i+u<taille_b&&i+u>=0)
+								{
+									if(j+k<taille_b&&j+k>=0)
+									{//Si on ne dépasse pas
+										if(bloc2[i+u][j+k]==1) cptv++;
+									}
+									else
+									{
+										bzero(buffer,256);
+										strcpy(buffer,"ENVOI");
+										printf("ENVOI \n");
+										n=write(sockfd,buffer,strlen(buffer));
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										sprintf(buffer,"I=%d J=%d",i+u,j+k);
+										printf("I=%d J=%d \n",i+u,j+k);
+										n=write(sockfd,buffer,strlen(buffer));
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+									}
+								}						
 							}
 						
 						}
-					}
 					
-				}
 				if(cptv!=2 &&cptv!=3)
 					bloc2[i][j]=0;				
 			}//FIN SI CELLULE VIVANTE
@@ -210,7 +215,7 @@ int main(int argc,char *argv[])
 				if(cptv==3)
 					bloc2[i][j]==1;
 			}
-			printf("Nouveau bloc [%d][%d] : %d \n",i,j,bloc2[i][j]);
+			//printf("Nouveau bloc [%d][%d] : %d \n",i,j,bloc2[i][j]);
 			
 		//FIN FOR
 		}
