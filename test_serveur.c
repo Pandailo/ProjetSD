@@ -190,8 +190,9 @@ int main(int argc, char* argcv[])
 	int rescmp3=1;
 	int rescmp4=1;
 	int rescmp5=1;
+	int arret=0;
 	pid_t pid;
-	char str1[10],str2[10],str3[10],str4[10],str5[10];
+	char str1[10],str2[10],str3[10],str4[10],str5[10],str6[10];
 
 	/********************************NUMERO DE PORT**************************/
 	if (argc<2)
@@ -228,6 +229,7 @@ int main(int argc, char* argcv[])
 		pid=fork();
 		if(pid==0)
 		{
+			char stop[4]="STOP";
 			do
 			{
 				bzero(buffer,256);
@@ -242,6 +244,8 @@ int main(int argc, char* argcv[])
 				rescmp2=strcmp(buffer,str3);
 				strcpy(str4,"BTRAITE");
 				rescmp3=strcmp(buffer,str4);
+				strcpy(str6,"STOP");
+				rescmp5=strcmp(buffer,str6);
 				strcpy(str5,"ENVOI");
 				rescmp4=strcmp(buffer,str5);
 				sprintf(tempo,"%d",(taille));
@@ -294,9 +298,10 @@ int main(int argc, char* argcv[])
 						error("ERROR ecrire dans socket");
 				
 				}
+				/*=======================DEMANDE DE VALEURS PAR COORDONNEES=================*/
 				if(rescmp4==0)
 				{
-					printf("Yo \n");
+					//NE PASSE QU'UNE FOIS ICI printf("Yo \n");
 					bzero(buffer,256);
 					n=read(newsockfd,buffer,256);
 					if(n<0)
@@ -306,13 +311,14 @@ int main(int argc, char* argcv[])
 					temp1=temp2=0;
 					int f=0;
 					char strt[10];
+					int neg=0;
 					while(buffer[h]!='\0')
 					{
 						if(buffer[h]=='I')
 						{
 							f=0;
 							h=h+2;
-							//On cherche le nombbre de chiffres derriere "I="
+							//On cherche le nombre de chiffres derriere "I="
 							while(buffer[h]!=' ')
 							{
 								f++;
@@ -324,41 +330,120 @@ int main(int argc, char* argcv[])
 							//On récupère lapartie utile
 							while(buffer[h]!=' ')
 							{
-								strt[f]=buffer[h];
-								f++;
-								h++;
+								if(buffer[h]=='-')
+								{
+									h++;
+									strt[f]=buffer[h];
+									f++;
+									h++;
+									neg=1;
+								}
+								else
+								{
+									strt[f]=buffer[h];
+									h++;
+									f++;
+								}
 							}
-							temp1=atoi(strt);
-							printf("Temp1 %d \n",temp1);
+							if(neg==1)
+							{
+								temp1=0-atoi(strt);
+								//printf("Temp1 %d ",temp1);
+							}
+							else
+							{
+								temp1=atoi(strt);
+								//printf("Temp1 %d \n",temp1);
+							}
 						}	
 						if(buffer[h]=='J')
 						{
 							f=0;
 							h=h+2;
-							while(buffer[h]!='\0')
+							while(buffer[h]!=' ')
 							{
 								f++;
 								h++;
 							}
+							f=f;
 							char strt2[f];
 							h=h-f;
+							neg=0;
 							f=0;
-							while(buffer[h]!='\0')
+							while(buffer[h]!=' ')
 							{
-								strt2[f]=buffer[h];
-								h++;
-								f++;
+								if(buffer[h]=='-')
+								{
+									h++;
+									strt2[f]=buffer[h];
+									f++;
+									h++;
+									neg=1;
+								}
+								else
+								{
+									strt2[f]=buffer[h];
+									h++;
+									f++;
+								}
 							}
-							temp2=atoi(strt2);
-							printf("Temp2 %d \n",temp2);
-						}		
+							if(neg==1)
+							{
+								temp2=0-atoi(strt2);
+								//printf("Temp2 %d \n",temp2);
+							}
+							else
+							{
+								temp2=atoi(strt2);
+								//printf("Temp2 %d \n",temp2);
+							}
+						}
+							char valco[1];
+							sprintf(valco,"%d",grille[temp1%taille][temp2%taille]);
+							n=write(newsockfd,valco,strlen(valco));
+							if(n<0)
+								error("ERROR ecrire dans socket");	
 						h++;
 					
 					}
+
+				}
+				if(rescmp3==0)
+				{
+					
+					printf("Nouveau bloc reçu : \n");
+					for(i=0;i<taillebloc;i++)
+					{
+						for(j=0;j<taillebloc;j++)
+						{
+							bzero(buffer,256);
+							n=read(newsockfd,buffer,1);
+							if(n<0)
+								error("ERROR lire dans socket a btraite");
+							if(atoi(buffer)<0)
+								j--;
+							else
+							{
+								grille[((i*taillebloc)/taille*taillebloc)+i][((i*taillebloc)%taille)+j]=atoi(buffer);
+								printf("%d ",grille[((i*taillebloc)/taille*taillebloc)+i][((i*taillebloc)%taille)+j]);
+							} 	
+						}
+						printf("\n");
+					}
+					char fin[5]="FIN";
+					n=write(newsockfd,fin,strlen(fin));
+					printf("FIN \n");
+					if(n<0)
+							error("ERROR ecrire dans socket");
 					bzero(buffer,256);
 
 				}
-				
+				if(rescmp5==0)
+				{
+					printf("ARRET");
+					arret=1;
+
+				}
 				/*else
 				{
 					close(newsockfd);
@@ -366,10 +451,10 @@ int main(int argc, char* argcv[])
 					exit(0); 
 				}
 				exit(0);*/
-				
 				}
-				while(strcmp(buffer,"STOP")!=0);
+				while(arret==0);
 				close(newsockfd);
+				//TODO retourner au père
 					return 0;
 					exit(0); 
 		}

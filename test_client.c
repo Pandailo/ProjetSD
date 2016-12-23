@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
 	printf("********************************** \n\n");
 	printf("taille bloc : %d \n",taille_b);
 	printf("********************************** \n\n\n");
-	/*RECEPTION DU BLOC ASSIGNE BLBLBLBL */
+	/*RECEPTION DU BLOC ASSIGNE  */
 	
 	bzero(buffer,256);
 	strcpy(buffer,"BLOC");
@@ -139,6 +139,7 @@ int main(int argc,char *argv[])
 	/*TRAITEMENT*/
 	int u=0;
 	int k=0;
+	int val=-1;
 	int cptv=0;
 	int tmp=0;
 	for(i=0;i<taille_b;i++)
@@ -146,7 +147,7 @@ int main(int argc,char *argv[])
 		for(j=0;j<taille_b;j++)
 		{//colonnes bloc
 		cptv=0;
-			if(bloc2[i][j]==0)
+			if(bloc2[i][j]==1)
 			{//si cellule vivante
 						for(u=-1;u<2;u++)
 						{
@@ -162,80 +163,207 @@ int main(int argc,char *argv[])
 									{
 										bzero(buffer,256);
 										strcpy(buffer,"ENVOI");
-										printf("ENVOI \n");
+										//printf("ENVOI \n");
 										n=write(sockfd,buffer,strlen(buffer));
 										if (n<0)
 											error("ERROR reading from socket");
 										bzero(buffer,256);
-										sprintf(buffer,"I=%d J=%d",i+u,j+k);
-										printf("I=%d J=%d \n",i+u,j+k);
+										sprintf(buffer," I=%d J=%d ",i+u,j+k);
+										//printf("I=%d J=%d \n",i+u,j+k);
+										n=write(sockfd,buffer,strlen(buffer));
+										sleep(0.5);
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										bzero(buffer,256);
+										n=read(sockfd,buffer,1);
+										if(n<0)
+											error("ERROR reading from socket");
+										val=atoi(buffer);
+										//printf("Valeur reçue : %d \n",val);
+										if(val==1)
+											cptv++;
+									}
+								}
+								else
+								{
+									if(j+k<taille_b&&j+k>=0)
+									{//Si on ne dépasse pas
+										if(bloc2[i+u][j+k]==1) cptv++;
+									}
+									else
+									{
+										bzero(buffer,256);
+										strcpy(buffer,"ENVOI");
+										//printf("ENVOI \n");
 										n=write(sockfd,buffer,strlen(buffer));
 										if (n<0)
 											error("ERROR reading from socket");
 										bzero(buffer,256);
+										sprintf(buffer," I=%d J=%d ",i+u,j+k);
+										//printf("I=%d J=%d \n",i+u,j+k);
+										n=write(sockfd,buffer,strlen(buffer));
+										sleep(1);
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										n=read(sockfd,buffer,1);
+										if(n<0)
+											error("ERROR reading from socket");
+										val=atoi(buffer);
+										//printf("Valeur reçue : %d \n",val);
+										if(val==1)
+											cptv++;
 									}
 								}						
 							}
 						
 						}
-					
+				printf("Nb voisins %d pour i=%d j=%d \n",cptv,i,j);
 				if(cptv!=2 &&cptv!=3)
-					bloc2[i][j]=0;				
+					bloc2[i][j]=0;
+				else printf("Valeur inchangée \n");				
 			}//FIN SI CELLULE VIVANTE
 			else
 			{
-				if(i+1==taille_b)
-				{//si bord
-					if(j+1==taille_b)
-					{//si coin
-					}
-					else
-					{
-					}
-				}
-				else
-				{
-					if(j+1==taille_b)
-					{//si bord
-					}
-					else
-					{
-						for(u=-1;u<2;u++)
+				for(u=-1;u<2;u++)
 						{
 							for(k=-1;k<2;k++)
 							{
-								if(u!=0&&k!=0)
-									{if(bloc2[i+u][j+k]==1) cptv++;}						
+								if(i+u<taille_b&&i+u>=0)
+								{
+									if(j+k<taille_b&&j+k>=0)
+									{//Si on ne dépasse pas
+										if(bloc2[i+u][j+k]==1) cptv++;
+									}
+									else
+									{
+										bzero(buffer,256);
+										strcpy(buffer,"ENVOI");
+										//printf("ENVOI \n");
+										n=write(sockfd,buffer,strlen(buffer));
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										sprintf(buffer," I=%d J=%d ",i+u,j+k);
+										//printf("I=%d J=%d \n",i+u,j+k);
+										n=write(sockfd,buffer,strlen(buffer));
+										sleep(1);
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										bzero(buffer,256);
+										n=read(sockfd,buffer,1);
+										if(n<0)
+											error("ERROR reading from socket");
+										val=atoi(buffer);
+										//printf("Valeur reçue : %d \n",val);
+										if(val==1)
+											cptv++;
+									}
+								}
+								else
+								{
+									if(j+k<taille_b&&j+k>=0)
+									{//Si on ne dépasse pas
+										if(bloc2[i+u][j+k]==1) cptv++;
+									}
+									else
+									{
+										bzero(buffer,256);
+										strcpy(buffer,"ENVOI");
+										//printf("ENVOI \n");
+										n=write(sockfd,buffer,strlen(buffer));
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										sprintf(buffer," I=%d J=%d ",i+u,j+k);
+										//printf("I=%d J=%d \n",i+u,j+k);
+										n=write(sockfd,buffer,strlen(buffer));
+										sleep(1);
+										if (n<0)
+											error("ERROR reading from socket");
+										bzero(buffer,256);
+										n=read(sockfd,buffer,1);
+										if(n<0)
+											error("ERROR reading from socket");
+										val=atoi(buffer);
+										//printf("Valeur reçue : %d \n",val);
+										if(val==1)
+											cptv++;
+									}
+								}						
 							}
 						
 						}
-					}
-					
-				}
+				printf("Nb voisins %d pour i=%d j=%d \n",cptv,i,j);			
 				if(cptv==3)
 					bloc2[i][j]==1;
+				else printf("Valeur inchangée \n");
 			}
-			//printf("Nouveau bloc [%d][%d] : %d \n",i,j,bloc2[i][j]);
+			
 			
 		//FIN FOR
 		}
 	}//FIN DOUBLE FOR
-		
+	printf("Nouveau bloc : \n");
+	for(i=0;i<taille_b;i++)
+	{
+		for(j=0;j<taille_b;j++)
+		{
+			printf("%d ",bloc2[i][j]);
+		}
+		printf("\n");
+	}
 	/*RENVOI*/
-	
+	bzero(buffer,256);
+	strcpy(buffer,"BTRAITE");
+	printf("Bloc traité \n");
+	n=write(sockfd,buffer,strlen(buffer));
+	if (n<0)
+		error("ERROR reading from socket");
+	bzero(buffer,256);
+	char btraite[1];
+	int bt=0;
+	for(i=0;i<taille_b;i++)
+	{
+		for(j=0;j<taille_b;j++)
+		{
+			sprintf(btraite,"%i",bloc2[i][j]);
+			n=write(sockfd,btraite,strlen(btraite));
+			if(n<0)
+				error("ERROR ecrire dans socket");
+		}
+	}
+	n=write(sockfd,btraite,strlen(btraite));
+	if (n<0)
+		error("ERROR reading from socket");
 	/*ARRET*/
 	
 	bzero(buffer,256);
 	strcpy(buffer,"STOP");
-	
-	n=write(sockfd,buffer,255);
+	n=write(sockfd,buffer,256);
 	if (n<0)
-	error("ERROR reading from socket");
-
+		error("ERROR reading from socket");
+	bzero(buffer,256);
+	char fin[5]="FIN";
+	while(strcmp(buffer,fin)!=0)
+	{
+		bzero(buffer,256);
+		n=read(sockfd,buffer,256);
+		if(n<0)
+			error("ERROR reading from socket");
+	}
+	bzero(buffer,256);
+	strcpy(buffer,"ARRET");
+	n=write(sockfd,buffer,256);
+	if (n<0)
+		error("ERROR reading from socket");
+	bzero(buffer,256);
+	printf("Demande d'arret \n");	
 	printf("*********** FINI************** \n");
 	printf("********************************** \n\n");
 	printf("********************************** \n\n");
-	bzero(buffer,256);
 	return 0;
 	
 }
