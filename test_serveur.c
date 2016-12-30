@@ -506,7 +506,7 @@ int main(int argc, char* argcv[])
 					return 0;
 					exit(0); 
 		}
-		close(newsockfd);
+		
 	}
 	while(1);
 	return 0;
