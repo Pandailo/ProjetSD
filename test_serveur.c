@@ -155,19 +155,27 @@ int main(int argc, char* argcv[])
 	int taillebloc=taille/sqrt(nbbloc);
 	int nbbloccote=taille/taillebloc;	
 	int points[nbbloc][2];
-	int envoye[nbbloc];
-	int traite[nbbloc];
+	int shtr;
+	int shenv;
+	int* fini;
 	int shmid;
 	int shmid2;
-	memset( envoye, 0, nbbloc*sizeof(int) );
-	memset( traite, 0, nbbloc*sizeof(int) );
+	int shmid3;
 	int** grilleT;
+	int* envoye;
+	int* traite;
 	if((shmid = shmget(IPC_PRIVATE, taille*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
         	perror("La mémoire paratgée c nul.");
        		exit(1);
     	}
-	grilleT = (int**)shmat(shmid, NULL, 0);
+    	if((shmid3 = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
+	{
+        	perror("La mémoire paratgée c nul.");
+       		exit(1);
+    	}
+    	fini=(int*)shmat(shmid3,NULL,0);
+	grilleT= (int**)shmat(shmid, NULL, 0);
 	for(i=0;i<taille;i++)
 	{
 		shmid2 = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700);
@@ -178,6 +186,18 @@ int main(int argc, char* argcv[])
 			exit(1);
 		}
 	}
+	if((shenv = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
+	{
+        	perror("La mémoire paratgée c nul.");
+       		exit(1);
+    	}
+    	envoye = (int*)shmat(shenv, NULL, 0);
+    	if((shtr = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
+	{
+        	perror("La mémoire paratgée c nul.");
+       		exit(1);
+    	}
+    	traite = (int*)shmat(shtr, NULL, 0);
 	//printf("taille d'un cote de la grille : %i, bloc/cote : %i, taille du cote d'un bloc : %i \n",n,nbbloccote,taillebloc);
 	for(i=0;i<nbbloc;i++)
 	{
@@ -460,6 +480,10 @@ int main(int argc, char* argcv[])
 							error("ERROR ecrire dans socket");
 					bzero(buffer,256);
 					traite[retour]=1;
+					if(retour==nbbloc-1)
+					{
+						fini[0]=1;
+					}
 
 				}
 				if(rescmp5==0)
@@ -478,7 +502,7 @@ int main(int argc, char* argcv[])
 				exit(0);*/
 				}
 				while(arret==0);
-				close(newsockfd);
+				close(newsockfd);	
 					return 0;
 					exit(0); 
 		}
