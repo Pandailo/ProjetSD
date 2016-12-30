@@ -170,9 +170,9 @@ int main(int argc, char* argcv[])
 	grilleT = (int**)shmat(shmid, NULL, 0);
 	for(i=0;i<taille;i++)
 	{
-		shmid = shmget(IPC_PRIVATE, taille*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700);
+		shmid2 = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700);
 		grilleT[i]=(int*)shmat(shmid2,NULL,0);
-		if(grilleT==NULL)
+		if(grilleT[i]==NULL)
 		{
 			perror("Shmget2");
 			exit(1);
@@ -270,6 +270,7 @@ int main(int argc, char* argcv[])
 				rescmp5=strcmp(buffer,str6);
 				strcpy(str5,"ENVOI");
 				rescmp4=strcmp(buffer,str5);
+				
 				sprintf(tempo,"%d",(taille));
 				sprintf(tempo2,"%d",(taillebloc));
 				if(rescmp==0)
@@ -464,7 +465,7 @@ int main(int argc, char* argcv[])
 				if(rescmp5==0)
 				{
 					
-					printf("ARRET");
+					printf("ARRET \n");
 					arret=1;
 
 				}
@@ -478,7 +479,6 @@ int main(int argc, char* argcv[])
 				}
 				while(arret==0);
 				close(newsockfd);
-				//TODO retourner au père
 					return 0;
 					exit(0); 
 		}

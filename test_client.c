@@ -20,8 +20,8 @@ void error(char *msg)
 int main(int argc,char *argv[])
 {
 	char rep;	
-	do
-	{
+	//do
+	//{
 	/**********************************************************CLIENT SERVEUR****************************************************************/
 	
 	int sockfd,newsockfd;
@@ -361,7 +361,7 @@ int main(int argc,char *argv[])
 	printf("*********** FINI, recommencer ?************** \n");
 	printf("********************************** \n\n");
 	printf("********************************** \n\n");
-	rep=
+	//rep=
 	return 0;
 	
 }
