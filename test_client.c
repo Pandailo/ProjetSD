@@ -19,8 +19,9 @@ void error(char *msg)
 
 int main(int argc,char *argv[])
 {
-	
-	
+	char rep;	
+	do
+	{
 	/**********************************************************CLIENT SERVEUR****************************************************************/
 	
 	int sockfd,newsockfd;
@@ -342,11 +343,6 @@ int main(int argc,char *argv[])
 	/*ARRET*/
 	
 	bzero(buffer,256);
-	strcpy(buffer,"STOP");
-	n=write(sockfd,buffer,256);
-	if (n<0)
-		error("ERROR reading from socket");
-	bzero(buffer,256);
 	char fin[5]="FIN";
 	while(strcmp(buffer,fin)!=0)
 	{
@@ -362,9 +358,10 @@ int main(int argc,char *argv[])
 		error("ERROR reading from socket");
 	bzero(buffer,256);
 	printf("Demande d'arret \n");	
-	printf("*********** FINI************** \n");
+	printf("*********** FINI, recommencer ?************** \n");
 	printf("********************************** \n\n");
 	printf("********************************** \n\n");
+	rep=
 	return 0;
 	
 }

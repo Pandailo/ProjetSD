@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/ipc.h> 
+#include <sys/shm.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <math.h>
@@ -154,7 +156,28 @@ int main(int argc, char* argcv[])
 	int nbbloccote=taille/taillebloc;	
 	int points[nbbloc][2];
 	int envoye[nbbloc];
+	int traite[nbbloc];
+	int shmid;
+	int shmid2;
 	memset( envoye, 0, nbbloc*sizeof(int) );
+	memset( traite, 0, nbbloc*sizeof(int) );
+	int** grilleT;
+	if((shmid = shmget(IPC_PRIVATE, taille*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700))<0)
+	{
+        	perror("La mémoire paratgée c nul.");
+       		exit(1);
+    	}
+	grilleT = (int**)shmat(shmid, NULL, 0);
+	for(i=0;i<taille;i++)
+	{
+		shmid = shmget(IPC_PRIVATE, taille*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700);
+		grilleT[i]=(int*)shmat(shmid2,NULL,0);
+		if(grilleT==NULL)
+		{
+			perror("Shmget2");
+			exit(1);
+		}
+	}
 	//printf("taille d'un cote de la grille : %i, bloc/cote : %i, taille du cote d'un bloc : %i \n",n,nbbloccote,taillebloc);
 	for(i=0;i<nbbloc;i++)
 	{
@@ -229,7 +252,6 @@ int main(int argc, char* argcv[])
 		pid=fork();
 		if(pid==0)
 		{
-			char stop[4]="STOP";
 			do
 			{
 				bzero(buffer,256);
@@ -272,7 +294,7 @@ int main(int argc, char* argcv[])
 				{/*************ON LIT LE BLOC ************/
 					for(i=0;i<nbbloc;i++)
 					{
-						if(envoye[i]==0)
+						if(envoye[i]==0||traite[i]==0)
 							{retour=i;i=nbbloc;}
 					}
 					i=retour;
@@ -410,22 +432,22 @@ int main(int argc, char* argcv[])
 				}
 				if(rescmp3==0)
 				{
-					
+					int k;	
 					printf("Nouveau bloc reçu : \n");
-					for(i=0;i<taillebloc;i++)
+					for(j=0;j<taillebloc;j++)
 					{
-						for(j=0;j<taillebloc;j++)
+						for(k=0;k<taillebloc;k++)
 						{
 							bzero(buffer,256);
 							n=read(newsockfd,buffer,1);
 							if(n<0)
 								error("ERROR lire dans socket a btraite");
 							if(atoi(buffer)<0)
-								j--;
+								k--;
 							else
 							{
-								grille[((i*taillebloc)/taille*taillebloc)+i][((i*taillebloc)%taille)+j]=atoi(buffer);
-								printf("%d ",grille[((i*taillebloc)/taille*taillebloc)+i][((i*taillebloc)%taille)+j]);
+								grilleT[((retour*taillebloc)/taille*taillebloc)+j][((retour*taillebloc)%taille)+k]=atoi(buffer);
+								printf("%d ",grilleT[((retour*taillebloc)/taille*taillebloc)+j][((retour*taillebloc)%taille)+k]);
 							} 	
 						}
 						printf("\n");
@@ -436,10 +458,12 @@ int main(int argc, char* argcv[])
 					if(n<0)
 							error("ERROR ecrire dans socket");
 					bzero(buffer,256);
+					traite[retour]=1;
 
 				}
 				if(rescmp5==0)
 				{
+					
 					printf("ARRET");
 					arret=1;
 
@@ -451,7 +475,6 @@ int main(int argc, char* argcv[])
 					exit(0); 
 				}
 				exit(0);*/
-				printf("buffer : %s \n",buffer);
 				}
 				while(arret==0);
 				close(newsockfd);
