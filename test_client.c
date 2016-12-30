@@ -171,6 +171,7 @@ int main(int argc,char *argv[])
 										sprintf(buffer," I=%d J=%d ",i+u,j+k);
 										//printf("I=%d J=%d \n",i+u,j+k);
 										n=write(sockfd,buffer,strlen(buffer));
+										//TODO A CHANGER !!!!!!
 										sleep(0.5);
 										if (n<0)
 											error("ERROR reading from socket");

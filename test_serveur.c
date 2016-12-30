@@ -244,7 +244,7 @@ int main(int argc, char* argcv[])
 				rescmp2=strcmp(buffer,str3);
 				strcpy(str4,"BTRAITE");
 				rescmp3=strcmp(buffer,str4);
-				strcpy(str6,"STOP");
+				strcpy(str6,"ARRET");
 				rescmp5=strcmp(buffer,str6);
 				strcpy(str5,"ENVOI");
 				rescmp4=strcmp(buffer,str5);
@@ -451,6 +451,7 @@ int main(int argc, char* argcv[])
 					exit(0); 
 				}
 				exit(0);*/
+				printf("buffer : %s \n",buffer);
 				}
 				while(arret==0);
 				close(newsockfd);
