@@ -52,25 +52,7 @@ int main(int argc, char* argcv[])
 		error("Apprend a compter");*/
 	
 	//****************************Création de la grille de 0 de la bonne taille*****
-	int shmid11;
-	int shmid12;
-	int** grille;
-	if((shmid11 = shmget(IPC_PRIVATE, param[0]*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700))<0)
-	{
-        	perror("La mémoire paratgée c nul.");
-       		exit(1);
-    	}
-	grille= (int**)shmat(shmid11, NULL, 0);
-	for(i=0;i<param[0];i++)
-	{
-		shmid12 = shmget(IPC_PRIVATE, param[0]*sizeof(int), IPC_CREAT | IPC_EXCL | 0700);
-		grille[i]=(int*)shmat(shmid12,NULL,0);
-		if(grille[i]==NULL)
-		{
-			perror("Shmget12");
-			exit(1);
-		}
-	}
+	int grille[param[0]][param[0]];
 	for(i=0;i<param[0];i++)
 	{
 		for(j=0;j<param[0];j++)
