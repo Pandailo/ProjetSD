@@ -228,6 +228,7 @@ int main(int argc, char* argcv[])
 	
 	int cptcli=0;
 	int rescmp=1;
+	int retour=0;
 	int rescmp1=1;
 	int rescmp2=1;
 	int rescmp3=1;
@@ -309,14 +310,14 @@ int main(int argc, char* argcv[])
 						error("ERROR ecrire dans socket");
 
 				}
-				int retour=0;
+				
 				
 				if(rescmp2==0)
 				{/*************ON LIT LE BLOC ************/
 					for(i=0;i<nbbloc;i++)
 					{
 						if(envoye[i]==0||traite[i]==0)
-							{retour=i;i=nbbloc;}
+							{retour=i;printf("Retour : %d \n",retour);i=nbbloc;}
 					}
 					i=retour;
 					bzero(buffer,256);
@@ -335,7 +336,7 @@ int main(int argc, char* argcv[])
 						}
 						j++;
 					}
-					envoye[i]=1;
+					envoye[retour]=1;
 				
 					if(n<0)
 						error("ERROR ecrire dans socket");
@@ -480,8 +481,10 @@ int main(int argc, char* argcv[])
 							error("ERROR ecrire dans socket");
 					bzero(buffer,256);
 					traite[retour]=1;
+					printf("Retour : %d Traite : %d Envoye : %d \n",retour,traite[retour],envoye[retour]);
 					if(retour==nbbloc-1)
 					{
+						printf("FINI \n");
 						fini[0]=1;
 					}
 
@@ -505,6 +508,19 @@ int main(int argc, char* argcv[])
 				close(newsockfd);	
 					return 0;
 					exit(0); 
+		}
+		if(fini[0]==1)
+		{
+			for(i=0;i<taille;i++)
+			{
+				for(j=0;j<taille;j++)
+				{
+					grille[i][j]=grilleT[i][j];
+					printf("%d ",grille[i][j]);
+				}
+				printf("\n");
+			}
+			printf("Grille recopiée \n");
 		}
 		
 	}

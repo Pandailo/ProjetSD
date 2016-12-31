@@ -19,9 +19,9 @@ void error(char *msg)
 
 int main(int argc,char *argv[])
 {
-	char rep;	
-	//do
-	//{
+	char rep='N';	
+	/*do
+	{*/
 	/**********************************************************CLIENT SERVEUR****************************************************************/
 	
 	int sockfd,newsockfd;
@@ -205,7 +205,7 @@ int main(int argc,char *argv[])
 										sprintf(buffer," I=%d J=%d ",i+u,j+k);
 										//printf("I=%d J=%d \n",i+u,j+k);
 										n=write(sockfd,buffer,strlen(buffer));
-										sleep(1);
+										sleep(1	);
 										if (n<0)
 											error("ERROR reading from socket");
 										bzero(buffer,256);
@@ -358,10 +358,19 @@ int main(int argc,char *argv[])
 		error("ERROR reading from socket");
 	bzero(buffer,256);
 	printf("Demande d'arret \n");	
-	printf("*********** FINI, recommencer ?************** \n");
+	printf("*********** FINI************** \n");
 	printf("********************************** \n\n");
 	printf("********************************** \n\n");
-	//rep=
+		/*printf("Recommencer O/N ?\n");
+		while ((rep = getchar()) != '\n' && rep != EOF);
+			scanf("%c",&rep);
+		if(rep!='O'||rep!='N')
+		{
+			printf("Merci d'entrer O ou N \n");
+	
+		}	
+	}
+	while(rep='O');*/
 	return 0;
 	
 }
