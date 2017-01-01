@@ -120,6 +120,7 @@ int main(int argc, char* argcv[])
 	int** grilleT;
 	int* envoye;
 	int* traite;
+	//GRILLE TRAITEE EN SHARED MEMORY
 	if((shmid = shmget(IPC_PRIVATE, taille*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
         	perror("La mémoire paratgée c nul.");
@@ -136,12 +137,14 @@ int main(int argc, char* argcv[])
 			exit(1);
 		}
 	}
+	//DIRE SI LA GRILLE EST FINIE DE TRAITE 
     	if((shmid3 = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
         	perror("La mémoire paratgée c nul.");
        		exit(1);
     	}
     	fini=(int*)shmat(shmid3,NULL,0);
+    	//SI PREMIER TOUR SUR LA GRILLE
     	if((shmid4 = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
         	perror("La mémoire paratgée c nul.");
@@ -345,6 +348,8 @@ int main(int argc, char* argcv[])
 				
 				sprintf(tempo,"%d",(taille));
 				sprintf(tempo2,"%d",(taillebloc));
+				
+				//ENVOI TAILLE GRILLE
 				if(rescmp==0)
 				{
 					n=write(newsockfd,tempo,strlen(tempo));
@@ -353,7 +358,7 @@ int main(int argc, char* argcv[])
 
 				}
 			
-			
+				//ENVOI TAILLE BLOC
 				if(rescmp1==0)
 				{
 					n=write(newsockfd,tempo2,strlen(tempo2));
@@ -362,7 +367,7 @@ int main(int argc, char* argcv[])
 
 				}
 				
-				
+				//ENVOI BLOC
 				if(rescmp2==0)
 				{/*************ON LIT LE BLOC ************/
 					for(i=0;i<nbbloc;i++)
@@ -503,6 +508,7 @@ int main(int argc, char* argcv[])
 					}
 
 				}
+				//RECEPTION BLOC TRAITE
 				if(rescmp3==0)
 				{
 					int k;	
@@ -540,6 +546,7 @@ int main(int argc, char* argcv[])
 					}
 
 				}
+				//ARRET DU CLIENT
 				if(rescmp5==0)
 				{
 					
