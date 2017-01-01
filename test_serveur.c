@@ -52,21 +52,41 @@ int main(int argc, char* argcv[])
 		error("Apprend a compter");*/
 	
 	//****************************Création de la grille de 0 de la bonne taille*****
-	int grille[param[0]][param[0]];
-	for(i=0;i<param[0];i++)
+	int taille=param[0];
+	/*int** grille;
+	int shm_gri;
+	int shm_gri2;
+	if((shm_gri = shmget(IPC_PRIVATE, taille*sizeof(int*), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
-		for(j=0;j<param[0];j++)
+        	perror("La mémoire paratgée c nul.");
+       		exit(1);
+    	}
+    	grille= (int**)shmat(shm_gri, NULL, 0);
+    	for(i=0;i<taille;i++)
+	{
+		shm_gri2 = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700);
+		grille[i]=(int*)shmat(shm_gri2,NULL,0);
+		if(grille[i]==NULL)
+		{
+			perror("shm_gri2");
+			exit(1);
+		}
+	}*/
+	int grille[taille][taille];
+	for(i=0;i<taille;i++)
+	{
+		for(j=0;j<taille;j++)
 		{
 			grille[i][j]=0;	
 		}
 	}
 	
 	//***************************Récupération des cellules vivantes de l'init**************
-	int cv[param[0]*param[0]];
+	int cv[taille*taille];
 	int cpt=0;	
 	while ((ret = fscanf (init,"%i ",&a)) != EOF && ret != 0)
 	{
-			if(a>param[0])
+			if(a>taille)
 				error("Elle est pas dans la grille laul");
 			cv[cpt]=a;
 			printf(" cv : %i \n",cv[cpt]);
@@ -84,7 +104,7 @@ int main(int argc, char* argcv[])
 	fclose(init);
 	
 	
-	int taille=param[0];
+	
 	int nbbloc=param[1];
 	int taillebloc=taille/sqrt(nbbloc);
 	int nbbloccote=taille/taillebloc;	
@@ -105,6 +125,17 @@ int main(int argc, char* argcv[])
         	perror("La mémoire paratgée c nul.");
        		exit(1);
     	}
+    	grilleT= (int**)shmat(shmid, NULL, 0);
+	for(i=0;i<taille;i++)
+	{
+		shmid2 = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700);
+		grilleT[i]=(int*)shmat(shmid2,NULL,0);
+		if(grilleT[i]==NULL)
+		{
+			perror("Shmget2");
+			exit(1);
+		}
+	}
     	if((shmid3 = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
         	perror("La mémoire paratgée c nul.");
@@ -118,17 +149,6 @@ int main(int argc, char* argcv[])
     	}
     	first_lap=(int*)shmat(shmid4,NULL,0);
     	first_lap[0]=1;
-	grilleT= (int**)shmat(shmid, NULL, 0);
-	for(i=0;i<taille;i++)
-	{
-		shmid2 = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700);
-		grilleT[i]=(int*)shmat(shmid2,NULL,0);
-		if(grilleT[i]==NULL)
-		{
-			perror("Shmget2");
-			exit(1);
-		}
-	}
 	if((shenv = shmget(IPC_PRIVATE, taille*sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
 	{
         	perror("La mémoire paratgée c nul.");
@@ -223,60 +243,8 @@ int main(int argc, char* argcv[])
 			}
 			printf("\n");
 	
-			//************************La vie mais pas en chine******************************
-			srand(time(NULL));
-			int LAUL= rand()%100;
-			if(LAUL<30)
-			{
-				srand(time(NULL));
-				int i_random= rand()%param[0];
-				int j_random= rand()%param[0];
-				if(grille[i_random][j_random]==1)
-					grille[i_random][j_random]=0;
-					else
-						grille[i_random][j_random]=1;
-			}
-			//*******************************Affichage grille pas chinoise********************
-			i=0;
-			for (i;i<param[0];i++)
-			{
-				j=0;
-				for (j;j<param[0];j++)
-				{
-					printf("%i ",grille[i][j]);
-				}
-				printf("\n");
-			}
-			printf("\n");
-			/*********************************LA MORT DIAGONALE***********************/
-	
-			srand(time(NULL));
-			int unponey= rand()%100;
-			if(unponey<30)
-			{
-				srand(time(NULL));
-				int i_random= rand()%param[0];
-				int j_random= rand()%param[0];
-				while(i_random<param[0]&&j_random<param[0])
-				{
-					grille[i_random][j_random]=0;
-					i_random++;
-					j_random++;
-				}
 			
-			}
-			//*******************************Affichage grille après la mort********************
-			i=0;
-			for (i;i<param[0];i++)
-			{
-				j=0;
-				for (j;j<param[0];j++)
-				{
-					printf("%i ",grille[i][j]);
-				}
-				printf("\n");
-			}
-			printf("\n");
+			
 		
 			/**************************AFFICHAGE DES BLOCS *******************************/
 			for(i=0;i<nbbloc;i++)
@@ -293,6 +261,60 @@ int main(int argc, char* argcv[])
 			}
 			first_lap[0]=0;
 		}
+		//************************La vie mais pas en chine******************************
+			srand(time(NULL));
+			int LAUL= rand()%100;
+			if(LAUL<30)
+			{
+				srand(time(NULL));
+				int i_random= rand()%param[0];
+				int j_random= rand()%param[0];
+				if(grille[i_random][j_random]==1)
+					grille[i_random][j_random]=0;
+					else
+						grille[i_random][j_random]=1;
+			
+				//*******************************Affichage grille pas chinoise********************
+				i=0;
+				for (i;i<param[0];i++)
+				{
+					j=0;
+					for (j;j<param[0];j++)
+					{
+						printf("%i ",grille[i][j]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+			}
+			/*********************************LA MORT DIAGONALE***********************/
+	
+			srand(time(NULL));
+			int unponey= rand()%100;
+			if(unponey<30)
+			{
+				srand(time(NULL));
+				int i_random= rand()%param[0];
+				int j_random= rand()%param[0];
+				while(i_random<param[0]&&j_random<param[0])
+				{
+					grille[i_random][j_random]=0;
+					i_random++;
+					j_random++;
+				}
+				//*******************************Affichage grille après la mort********************
+				i=0;
+				for (i;i<param[0];i++)
+				{
+					j=0;
+					for (j;j<param[0];j++)
+					{
+						printf("%i ",grille[i][j]);
+					}
+					printf("\n");
+				}
+				printf("\n");
+			}
 		bzero((char *) &client_addr,sizeof(client_addr));
 		cli_addrlen=sizeof(client_addr);
 		newsockfd=accept(sockfd,(struct sockaddr *) &client_addr,&cli_addrlen);
