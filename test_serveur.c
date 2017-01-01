@@ -231,7 +231,7 @@ int main(int argc, char* argcv[])
 			}
 			printf("Grille recopiée \n");
 		}
-		//*******************************Affichage grille initiale*********************
+		//*******************************Affichage grille initiale (fonctions de vie ou de mort au premier tour pour éviter de fausser les calculs*********************
 		if(first_lap[0]==1)
 		{
 			i=0;
@@ -263,7 +263,7 @@ int main(int argc, char* argcv[])
 				}
 			}
 			first_lap[0]=0;
-		}
+		
 		//************************La vie mais pas en chine******************************
 			srand(time(NULL));
 			int LAUL= rand()%100;
@@ -318,6 +318,7 @@ int main(int argc, char* argcv[])
 				}
 				printf("\n");
 			}
+		}
 		bzero((char *) &client_addr,sizeof(client_addr));
 		cli_addrlen=sizeof(client_addr);
 		newsockfd=accept(sockfd,(struct sockaddr *) &client_addr,&cli_addrlen);
@@ -390,6 +391,7 @@ int main(int argc, char* argcv[])
 									error("ERROR ecrire dans socket");							
 							k++;
 						}
+						printf("\n");
 						j++;
 					}
 					envoye[retour]=1;
