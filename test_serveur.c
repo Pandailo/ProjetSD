@@ -83,73 +83,7 @@ int main(int argc, char* argcv[])
 	}	
 	fclose(init);
 	
-	//*******************************Affichage grille initiale*********************
-	i=0;
-	for (i;i<param[0];i++)
-	{
-		j=0;
-		for (j;j<param[0];j++)
-		{
-			printf("%i ",grille[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
 	
-	//************************La vie mais pas en chine******************************
-	srand(time(NULL));
-	int LAUL= rand()%100;
-	if(LAUL<30)
-	{
-		srand(time(NULL));
-		int i_random= rand()%param[0];
-		int j_random= rand()%param[0];
-		if(grille[i_random][j_random]==1)
-			grille[i_random][j_random]=0;
-			else
-				grille[i_random][j_random]=1;
-	}
-	//*******************************Affichage grille pas chinoise********************
-	i=0;
-	for (i;i<param[0];i++)
-	{
-		j=0;
-		for (j;j<param[0];j++)
-		{
-			printf("%i ",grille[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-	/*********************************LA MORT DIAGONALE***********************/
-	
-	srand(time(NULL));
-	int unponey= rand()%100;
-	if(unponey<30)
-	{
-		srand(time(NULL));
-		int i_random= rand()%param[0];
-		int j_random= rand()%param[0];
-		while(i_random<param[0]&&j_random<param[0])
-		{
-			grille[i_random][j_random]=0;
-			i_random++;
-			j_random++;
-		}
-			
-	}
-	//*******************************Affichage grille après la mort********************
-	i=0;
-	for (i;i<param[0];i++)
-	{
-		j=0;
-		for (j;j<param[0];j++)
-		{
-			printf("%i ",grille[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
 	int taille=param[0];
 	int nbbloc=param[1];
 	int taillebloc=taille/sqrt(nbbloc);
@@ -161,6 +95,8 @@ int main(int argc, char* argcv[])
 	int shmid;
 	int shmid2;
 	int shmid3;
+	int* first_lap;
+	int shmid4;
 	int** grilleT;
 	int* envoye;
 	int* traite;
@@ -175,6 +111,13 @@ int main(int argc, char* argcv[])
        		exit(1);
     	}
     	fini=(int*)shmat(shmid3,NULL,0);
+    	if((shmid4 = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | IPC_EXCL | 0700))<0)
+	{
+        	perror("La mémoire paratgée c nul.");
+       		exit(1);
+    	}
+    	first_lap=(int*)shmat(shmid4,NULL,0);
+    	first_lap[0]=1;
 	grilleT= (int**)shmat(shmid, NULL, 0);
 	for(i=0;i<taille;i++)
 	{
@@ -206,19 +149,6 @@ int main(int argc, char* argcv[])
 		//CASE EN HAUT A GAUCHE
 		//printf("coordonnées du bloc %i x : %i, y : %i \n",i,points[i][0],points[i][1]);	
 
-	}
-	/**************************AFFICHAGE DES BLOCS *******************************/
-	for(i=0;i<nbbloc;i++)
-	{
-		printf("Bloc n°%i :\n",i);
-		for (j=0;j<taillebloc;j++)
-		{
-			int k=0;
-			for (k=0;k<taillebloc;k++)
-			{
-				printf("%i ",grille[((i*taillebloc)/taille*taillebloc)+j][((i*taillebloc)%taille)+k]);		
-			}printf("\n");
-		}
 	}
 	/************************* SERVEUR *******************************/
 	
@@ -264,6 +194,105 @@ int main(int argc, char* argcv[])
 	listen(sockfd,5);
 	do
 	{
+		if(fini[0]==1)
+		{
+			first_lap[0]=1;
+			for(i=0;i<taille;i++)
+			{
+				for(j=0;j<taille;j++)
+				{
+					grille[i][j]=grilleT[i][j];
+					printf("%d ",grille[i][j]);
+				}
+				printf("\n");
+			}
+			printf("Grille recopiée \n");
+		}
+		//*******************************Affichage grille initiale*********************
+		if(first_lap[0]==1)
+		{
+			i=0;
+			for (i;i<param[0];i++)
+			{
+				j=0;
+				for (j;j<param[0];j++)
+				{
+					printf("%i ",grille[i][j]);
+				}
+				printf("\n");
+			}
+			printf("\n");
+	
+			//************************La vie mais pas en chine******************************
+			srand(time(NULL));
+			int LAUL= rand()%100;
+			if(LAUL<30)
+			{
+				srand(time(NULL));
+				int i_random= rand()%param[0];
+				int j_random= rand()%param[0];
+				if(grille[i_random][j_random]==1)
+					grille[i_random][j_random]=0;
+					else
+						grille[i_random][j_random]=1;
+			}
+			//*******************************Affichage grille pas chinoise********************
+			i=0;
+			for (i;i<param[0];i++)
+			{
+				j=0;
+				for (j;j<param[0];j++)
+				{
+					printf("%i ",grille[i][j]);
+				}
+				printf("\n");
+			}
+			printf("\n");
+			/*********************************LA MORT DIAGONALE***********************/
+	
+			srand(time(NULL));
+			int unponey= rand()%100;
+			if(unponey<30)
+			{
+				srand(time(NULL));
+				int i_random= rand()%param[0];
+				int j_random= rand()%param[0];
+				while(i_random<param[0]&&j_random<param[0])
+				{
+					grille[i_random][j_random]=0;
+					i_random++;
+					j_random++;
+				}
+			
+			}
+			//*******************************Affichage grille après la mort********************
+			i=0;
+			for (i;i<param[0];i++)
+			{
+				j=0;
+				for (j;j<param[0];j++)
+				{
+					printf("%i ",grille[i][j]);
+				}
+				printf("\n");
+			}
+			printf("\n");
+		
+			/**************************AFFICHAGE DES BLOCS *******************************/
+			for(i=0;i<nbbloc;i++)
+			{
+				printf("Bloc n°%i :\n",i);
+				for (j=0;j<taillebloc;j++)
+				{
+					int k=0;
+					for (k=0;k<taillebloc;k++)
+					{
+						printf("%i ",grille[((i*taillebloc)/taille*taillebloc)+j][((i*taillebloc)%taille)+k]);		
+					}printf("\n");
+				}
+			}
+			first_lap[0]=0;
+		}
 		bzero((char *) &client_addr,sizeof(client_addr));
 		cli_addrlen=sizeof(client_addr);
 		newsockfd=accept(sockfd,(struct sockaddr *) &client_addr,&cli_addrlen);
@@ -509,19 +538,7 @@ int main(int argc, char* argcv[])
 					return 0;
 					exit(0); 
 		}
-		if(fini[0]==1)
-		{
-			for(i=0;i<taille;i++)
-			{
-				for(j=0;j<taille;j++)
-				{
-					grille[i][j]=grilleT[i][j];
-					printf("%d ",grille[i][j]);
-				}
-				printf("\n");
-			}
-			printf("Grille recopiée \n");
-		}
+		
 		
 	}
 	while(1);
