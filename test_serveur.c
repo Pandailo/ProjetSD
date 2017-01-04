@@ -225,15 +225,24 @@ int main(int argc, char* argcv[])
 				for(j=0;j<taille;j++)
 				{
 					grille[i][j]=grilleT[i][j];
-					printf("%d ",grille[i][j]);
+					//printf("%d ",grille[i][j]);
 				}
 				printf("\n");
 			}
-			printf("Grille recopiée \n");
+			for(i=0;i<nbbloc;i++)
+			{
+				
+				envoye[i]=traite[i]=0;
+				
+				
+			}
+			fini[0]=0;
+			//printf("Grille recopiée \n");
 		}
 		//*******************************Affichage grille initiale (fonctions de vie ou de mort au premier tour pour éviter de fausser les calculs*********************
 		if(first_lap[0]==1)
 		{
+		first_lap[0]=0;
 			i=0;
 			for (i;i<param[0];i++)
 			{
@@ -250,7 +259,7 @@ int main(int argc, char* argcv[])
 			
 		
 			/**************************AFFICHAGE DES BLOCS *******************************/
-			for(i=0;i<nbbloc;i++)
+			/*for(i=0;i<nbbloc;i++)
 			{
 				printf("Bloc n°%i :\n",i);
 				for (j=0;j<taillebloc;j++)
@@ -261,21 +270,29 @@ int main(int argc, char* argcv[])
 						printf("%i ",grille[((i*taillebloc)/taille*taillebloc)+j][((i*taillebloc)%taille)+k]);		
 					}printf("\n");
 				}
-			}
+			}*/
 			first_lap[0]=0;
 		
 		//************************La vie mais pas en chine******************************
+			
 			srand(time(NULL));
 			int LAUL= rand()%100;
-			if(LAUL<30)
+			if(LAUL<40)
 			{
 				srand(time(NULL));
 				int i_random= rand()%param[0];
 				int j_random= rand()%param[0];
+				
 				if(grille[i_random][j_random]==1)
+				{
 					grille[i_random][j_random]=0;
+					printf("Mort de la case : [%d][%d] \n",i_random,j_random);
+				} 
 					else
+					{
 						grille[i_random][j_random]=1;
+						printf("Vie de la case : [%d][%d] \n",i_random,j_random);
+					}
 			
 				//*******************************Affichage grille pas chinoise********************
 				i=0;
@@ -294,17 +311,23 @@ int main(int argc, char* argcv[])
 	
 			srand(time(NULL));
 			int unponey= rand()%100;
-			if(unponey<30)
+			if(unponey<=10)
 			{
+				printf("DIAGO \n");
 				srand(time(NULL));
 				int i_random= rand()%param[0];
 				int j_random= rand()%param[0];
-				while(i_random<param[0]&&j_random<param[0])
+				int tempi=i_random;
+				int tempj=j_random;
+				
+				do
 				{
+					printf("Randoms : i %d j %d \n",i_random,j_random);
 					grille[i_random][j_random]=0;
-					i_random++;
-					j_random++;
+					i_random=(i_random+1)%param[0];
+					j_random=(j_random+1)%param[0];
 				}
+				while(i_random!=tempi&&j_random!=tempj);
 				//*******************************Affichage grille après la mort********************
 				i=0;
 				for (i;i<param[0];i++)
@@ -362,6 +385,7 @@ int main(int argc, char* argcv[])
 				//ENVOI TAILLE BLOC
 				if(rescmp1==0)
 				{
+					first_lap[0]=0;
 					n=write(newsockfd,tempo2,strlen(tempo2));
 					if(n<0)
 						error("ERROR ecrire dans socket");
@@ -370,29 +394,28 @@ int main(int argc, char* argcv[])
 				
 				//ENVOI BLOC
 				if(rescmp2==0)
-				{/*************ON LIT LE BLOC ************/
+				{/*************ON CHERCHE LE BLOC A ENVOYER ************/
 					for(i=0;i<nbbloc;i++)
 					{
-						if(envoye[i]==0||traite[i]==0)
-							{retour=i;printf("Retour : %d \n",retour);i=nbbloc;}
+						if(envoye[i]==0&&traite[i]==0)
+							{retour=i;//printf("Retour : %d Traite[i] %d envoye[i] %d\n",retour,traite[i],envoye[i]);
+							i=nbbloc;
+							}
 					}
 					i=retour;
 					bzero(buffer,256);
 					j=0;
 					int k=0;
-					while(j<taillebloc)
+					for(j=0;j<taillebloc;j++)
 					{
-						k=0;
-						while(k<taillebloc)
+						for(k=0;k<taillebloc;k++)
 						{
-								sprintf(tempo3,"%i",(grille[((i*taillebloc)/taille*taillebloc)+j][((i*taillebloc)%taille)+k]));
+								sprintf(tempo3,"%i",(grille[((retour*taillebloc)/taille*taillebloc)+j][((retour*taillebloc)%taille)+k]));
 								n=write(newsockfd,tempo3,strlen(tempo3));
 								if(n<0)
 									error("ERROR ecrire dans socket");							
-							k++;
 						}
-						printf("\n");
-						j++;
+						//printf("\n");;
 					}
 					envoye[retour]=1;
 				
@@ -403,14 +426,13 @@ int main(int argc, char* argcv[])
 				/*=======================DEMANDE DE VALEURS PAR COORDONNEES=================*/
 				if(rescmp4==0)
 				{
-					//NE PASSE QU'UNE FOIS ICI printf("Yo \n");
 					bzero(buffer,256);
 					n=read(newsockfd,buffer,256);
 					if(n<0)
 						error("ERROR lire dans socket");
 					int h=0;
 					int temp1,temp2;
-					temp1=temp2=0;
+					temp1=temp2=-1;
 					int f=0;
 					char strt[10];
 					int neg=0;
@@ -429,7 +451,7 @@ int main(int argc, char* argcv[])
 							char strt[f];
 							h=h-f;
 							f=0;
-							//On récupère lapartie utile
+							//On récupère la partie utile
 							while(buffer[h]!=' ')
 							{
 								if(buffer[h]=='-')
@@ -450,12 +472,12 @@ int main(int argc, char* argcv[])
 							if(neg==1)
 							{
 								temp1=0-atoi(strt);
-								//printf("Temp1 %d ",temp1);
+								//printf("Temp1 %d ",temp1%taille);
 							}
 							else
 							{
 								temp1=atoi(strt);
-								//printf("Temp1 %d \n",temp1);
+								//printf("Temp1 %d \n",temp1%taille);
 							}
 						}	
 						if(buffer[h]=='J')
@@ -492,19 +514,23 @@ int main(int argc, char* argcv[])
 							if(neg==1)
 							{
 								temp2=0-atoi(strt2);
-								//printf("Temp2 %d \n",temp2);
+								//printf("Temp2 %d \n",temp2%taille);
 							}
 							else
 							{
 								temp2=atoi(strt2);
-								//printf("Temp2 %d \n",temp2);
+								//printf("Temp2 %d \n",temp2%taille);
 							}
 						}
+						if(temp2!=-1&&temp1!=-1)
+						{
 							char valco[1];
-							sprintf(valco,"%d",grille[temp1%taille][temp2%taille]);
+							printf("Envoi : %d pour [%d][%d] \n",grille[(((retour*taillebloc)/taille*taillebloc)+(temp1))%taille][(((retour*taillebloc)%taille)+temp2)%taille],temp1,temp2);
+							sprintf(valco,"%d",grille[(((retour*taillebloc)/taille*taillebloc)+(temp1))%taille][(((retour*taillebloc)%taille)+temp2)%taille]);
 							n=write(newsockfd,valco,strlen(valco));
 							if(n<0)
-								error("ERROR ecrire dans socket");	
+								error("ERROR ecrire dans socket");
+						}	
 						h++;
 					
 					}
@@ -514,7 +540,7 @@ int main(int argc, char* argcv[])
 				if(rescmp3==0)
 				{
 					int k;	
-					printf("Nouveau bloc reçu : \n");
+					//printf("Nouveau bloc reçu : \n");
 					for(j=0;j<taillebloc;j++)
 					{
 						for(k=0;k<taillebloc;k++)
@@ -528,22 +554,22 @@ int main(int argc, char* argcv[])
 							else
 							{
 								grilleT[((retour*taillebloc)/taille*taillebloc)+j][((retour*taillebloc)%taille)+k]=atoi(buffer);
-								printf("%d ",grilleT[((retour*taillebloc)/taille*taillebloc)+j][((retour*taillebloc)%taille)+k]);
+								//printf("%d ",grilleT[((retour*taillebloc)/taille*taillebloc)+j][((retour*taillebloc)%taille)+k]);
 							} 	
 						}
-						printf("\n");
+						//printf("\n");
 					}
 					char fin[5]="FIN";
 					n=write(newsockfd,fin,strlen(fin));
-					printf("FIN \n");
+					//printf("FIN \n");
 					if(n<0)
 							error("ERROR ecrire dans socket");
 					bzero(buffer,256);
 					traite[retour]=1;
-					printf("Retour : %d Traite : %d Envoye : %d \n",retour,traite[retour],envoye[retour]);
+					//printf("Retour : %d Traite : %d Envoye : %d \n",retour,traite[retour],envoye[retour]);
 					if(retour==nbbloc-1)
 					{
-						printf("FINI \n");
+						//printf("FINI \n");
 						fini[0]=1;
 					}
 
@@ -552,7 +578,7 @@ int main(int argc, char* argcv[])
 				if(rescmp5==0)
 				{
 					
-					printf("ARRET \n");
+					//printf("ARRET \n");
 					arret=1;
 
 				}
